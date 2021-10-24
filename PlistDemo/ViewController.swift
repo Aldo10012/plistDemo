@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController {
     
     // MARK: Properties
     
@@ -26,21 +26,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
        
         //TODO: Get the list of scores coming from your plist
         
-        /// Find the path to the pList file
-        let bundle = Bundle.main
-        guard let scoresPlistURL = bundle.url(forResource: "Scores", withExtension: "plist") else { return }
+        let plistData = getPlistData()
         
-        /// Load file using FIleManager
-        let fileManager = FileManager.default
-        guard let scoresPlistData = fileManager.contents(atPath: scoresPlistURL.path) else { return }
+        for entry in plistData {
+            let score = Score(name: entry["name"] as! String, score: entry["score"] as! Int)
+            self.scores.append(score)
+        }
         
-        /// Decode file into Swift Struct using propertyListDecoder
-        let pListDecoder = PropertyListDecoder()
-        guard let scores = try? pListDecoder.decode([Score].self, from: scoresPlistData) else { return }
+        print("SCORES:\n", self.scores)
         
-        print(scores)
-        
-        self.scores = scores
         
         
         
@@ -91,10 +85,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         print("Favorite character:", favoriteCharacterName)
     }
     
+    // MARK: UserDefault Handling
     private func getPlistData() -> Array<AnyObject> {
         let plist = Plist(name: "Scores")!
         let plistData = plist.getValuesInPlistFile()! as Array
-        print(plistData)
+//        print(plistData)
         return plistData
     }
     
@@ -102,7 +97,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 }
 
 // MARK: TableView setup
-extension ViewController {
+extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return scores.count
         
@@ -131,10 +126,4 @@ extension ViewController {
         userDefaults.set(name, forKey: UserDefaultKey.favoriteCharacterName.rawValue)
         printUserDefaults()
     }
-}
-
-
-// MARK: Plist Helper
-struct PlistHelper {
-    
 }
