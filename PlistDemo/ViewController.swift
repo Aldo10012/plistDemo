@@ -36,9 +36,10 @@ class ViewController: UIViewController {
         print("SCORES:\n", self.scores)
         
         
-        
-        
         //TODO: Add two entries by code
+        
+        addValuesToPlist(name: "Erick", score: 18)
+        addValuesToPlist(name: "Abraham", score: 9)
         
         
         //TODO: Display the complete list of scores in the table view
@@ -91,6 +92,29 @@ class ViewController: UIViewController {
         let plistData = plist.getValuesInPlistFile()! as Array
 //        print(plistData)
         return plistData
+    }
+    
+    private func addValuesToPlist(name: String, score: Int) {
+        if let plist = Plist(name: "Scores") {
+//            let dict = plist.getMutablePlistFile()!
+            
+            guard let dict = plist.getMutablePlistFile() else {
+                print("ERROR")
+                return
+            }
+            
+            dict[name] = score
+            
+            do {
+                try plist.addValuesToPlistFile(dictionary: dict)
+            } catch {
+                print(error)
+            }
+            print(plist.getValuesInPlistFile())
+        } else {
+            print("Unable to get Plist")
+        }
+        
     }
     
     
